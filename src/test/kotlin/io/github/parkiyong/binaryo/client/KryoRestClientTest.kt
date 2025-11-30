@@ -6,6 +6,7 @@ import com.sun.net.httpserver.HttpServer
 import io.github.parkiyong.binaryo.codec.KryoCodec
 import io.github.parkiyong.binaryo.codec.DefaultKryoFactory
 import io.github.parkiyong.binaryo.codec.KryoPool
+import io.github.parkiyong.binaryo.exception.BinaryoTransportException
 import io.github.parkiyong.binaryo.http.JdkHttpTransport
 import io.github.parkiyong.binaryo.http.Transport
 import java.io.IOException
@@ -78,10 +79,12 @@ class KryoRestClientTest {
     fun postAndDecode_httpErrorThrows() {
         val client = KryoRestClient(codec, JdkHttpTransport())
         val target = baseUri.resolve("/error")
-        val ex = assertFailsWith<IllegalStateException> {
+        val ex = assertFailsWith<BinaryoTransportException> {
             client.postAndDecode(target, Person("Bob", 25), Person::class)
         }
         assertTrue(ex.message!!.contains("HTTP 400"))
+        assertEquals(400, ex.statusCode)
+        assertNotNull(ex.responseBody)
     }
 
     private fun respond(

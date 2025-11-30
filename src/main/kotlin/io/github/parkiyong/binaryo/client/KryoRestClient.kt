@@ -1,6 +1,7 @@
 package io.github.parkiyong.binaryo.client
 
 import io.github.parkiyong.binaryo.codec.KryoCodec
+import io.github.parkiyong.binaryo.exception.BinaryoTransportException
 import io.github.parkiyong.binaryo.http.Transport
 import java.net.URI
 import java.nio.charset.StandardCharsets
@@ -33,7 +34,8 @@ class KryoRestClient(
 
     /**
      * POST a value and expect a binary Kryo response that decodes to [expected].
-     * Throws [IllegalStateException] if response status is not 2xx.
+     * @throws BinaryoTransportException if response status is not 2xx
+     * @throws BinaryoSerializationException if deserialization fails
      */
     fun <T: Any, R: Any> postAndDecode(
         url: URI,
@@ -44,14 +46,19 @@ class KryoRestClient(
         val resp = post(url, value, headers)
         if (resp.status !in 200..299) {
             val snippet = resp.body.decodeToStringSafely()
-            throw IllegalStateException("HTTP ${resp.status}: $snippet")
+            throw BinaryoTransportException(
+                "HTTP ${resp.status}: $snippet",
+                statusCode = resp.status,
+                responseBody = resp.body
+            )
         }
         return codec.fromBytes(resp.body, expected)
     }
 
     /**
-     * GET and decode a binary Kryo response to [expected]. Throws [IllegalStateException]
-     * on non-2xx responses.
+     * GET and decode a binary Kryo response to [expected].
+     * @throws BinaryoTransportException if response status is not 2xx
+     * @throws BinaryoSerializationException if deserialization fails
      */
     fun <T: Any> getAndDecode(
         url: URI,
@@ -62,7 +69,11 @@ class KryoRestClient(
         val resp = transport.get(url, extraHeaders)
         if (resp.status !in 200..299) {
             val snippet = resp.body.decodeToStringSafely()
-            throw IllegalStateException("HTTP ${resp.status}: $snippet")
+            throw BinaryoTransportException(
+                "HTTP ${resp.status}: $snippet",
+                statusCode = resp.status,
+                responseBody = resp.body
+            )
         }
         return codec.fromBytes(resp.body, expected)
     }

@@ -1,5 +1,7 @@
 package io.github.parkiyong.binaryo.codec
 
+import io.github.parkiyong.binaryo.exception.BinaryoSerializationException
+import io.github.parkiyong.binaryo.exception.BinaryoValidationException
 import kotlin.test.*
 
 private data class User(val name: String, val age: Int)
@@ -30,12 +32,14 @@ class KryoCodecTest {
     }
 
     @Test
-    fun fromBytes_typeMismatch_throwsClassCast() {
+    fun fromBytes_typeMismatch_throwsSerializationException() {
         val original = User("Dan", 18)
         val bytes = codec.toBytes(original)
-        assertFailsWith<ClassCastException> {
+        val ex = assertFailsWith<BinaryoSerializationException> {
             codec.fromBytes(bytes, Item::class)
         }
+        assertTrue(ex.message!!.contains("Item"))
+        assertEquals("io.github.parkiyong.binaryo.codec.Item", ex.targetType)
     }
 
     @Test
@@ -68,5 +72,13 @@ class KryoCodecTest {
         val bytesValue = codec.toBytes(withValue)
         val restoredValue = codec.fromBytes(bytesValue, Optional::class)
         assertEquals(withValue, restoredValue)
+    }
+
+    @Test
+    fun fromBytes_emptyArray_throwsValidationException() {
+        val ex = assertFailsWith<BinaryoValidationException> {
+            codec.fromBytes(ByteArray(0), User::class)
+        }
+        assertTrue(ex.message!!.contains("empty"))
     }
 }

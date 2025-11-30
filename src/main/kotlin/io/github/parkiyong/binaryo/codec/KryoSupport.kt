@@ -5,6 +5,8 @@ import com.esotericsoftware.kryo.io.Input
 import com.esotericsoftware.kryo.io.Output
 import com.esotericsoftware.kryo.serializers.CompatibleFieldSerializer
 import com.esotericsoftware.kryo.util.DefaultInstantiatorStrategy
+import io.github.parkiyong.binaryo.exception.BinaryoSerializationException
+import io.github.parkiyong.binaryo.exception.BinaryoValidationException
 import org.objenesis.strategy.StdInstantiatorStrategy
 import kotlin.reflect.KClass
 
@@ -34,18 +36,40 @@ class KryoPool(private val factory: () -> Kryo) {
 }
 
 fun Kryo.writeAny(value: Any): ByteArray {
-    Output(256, -1).use { out ->
-        writeClassAndObject(out, value)
-        out.flush()
-        return out.toBytes()
+    try {
+        Output(256, -1).use { out ->
+            writeClassAndObject(out, value)
+            out.flush()
+            return out.toBytes()
+        }
+    } catch (e: Exception) {
+        throw BinaryoSerializationException(
+            "Failed to serialize object of type ${value::class.qualifiedName}",
+            targetType = value::class.qualifiedName,
+            cause = e
+        )
     }
 }
 
 @Suppress("UNCHECKED_CAST")
 fun <T: Any> Kryo.readAny(bytes: ByteArray, expected: KClass<T>): T {
-    Input(bytes).use { input ->
-        val obj = readClassAndObject(input)
-        return expected.java.cast(obj)
+    try {
+        Input(bytes).use { input ->
+            val obj = readClassAndObject(input)
+            return expected.java.cast(obj)
+        }
+    } catch (e: ClassCastException) {
+        throw BinaryoSerializationException(
+            "Failed to deserialize to type ${expected.qualifiedName}: type mismatch",
+            targetType = expected.qualifiedName,
+            cause = e
+        )
+    } catch (e: Exception) {
+        throw BinaryoSerializationException(
+            "Failed to deserialize to type ${expected.qualifiedName}",
+            targetType = expected.qualifiedName,
+            cause = e
+        )
     }
 }
 
@@ -64,8 +88,13 @@ class KryoCodec(private val pool: KryoPool) {
 
     /**
      * Deserialize binary Kryo data back to an object of [expected] type.
+     * @throws BinaryoValidationException if the input byte array is empty
+     * @throws BinaryoSerializationException if deserialization fails
      */
     fun <T: Any> fromBytes(bytes: ByteArray, expected: KClass<T>): T {
+        if (bytes.isEmpty()) {
+            throw BinaryoValidationException("Cannot deserialize empty byte array")
+        }
         val kryo = pool.borrow()
         return kryo.readAny(bytes, expected)
     }

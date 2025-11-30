@@ -163,18 +163,42 @@ val response = client.postAndDecode(
 
 ### Error Handling
 
+The library provides a custom exception hierarchy for better error categorization:
+
 ```kotlin
+import io.github.parkiyong.binaryo.exception.*
+
 try {
     val person = client.getAndDecode(uri, Person::class)
     println(person)
-} catch (e: IllegalStateException) {
-    // HTTP error (non-2xx status)
-    println("HTTP error: ${e.message}")
-} catch (e: ClassCastException) {
-    // Type mismatch in deserialization
-    println("Type error: ${e.message}")
+} catch (e: BinaryoTransportException) {
+    // HTTP or network error
+    println("Transport error: ${e.message}")
+    e.statusCode?.let { println("HTTP status: $it") }
+    e.responseBody?.let { println("Response: ${String(it)}") }
+} catch (e: BinaryoSerializationException) {
+    // Serialization or deserialization error
+    println("Serialization error: ${e.message}")
+    e.targetType?.let { println("Target type: $it") }
+} catch (e: BinaryoValidationException) {
+    // Input validation error (e.g., empty byte array)
+    println("Validation error: ${e.message}")
+} catch (e: BinaryoException) {
+    // Catch-all for any Binaryo-related error
+    println("Binaryo error: ${e.message}")
 }
 ```
+
+#### Exception Hierarchy
+
+| Exception | Description | Properties |
+|-----------|-------------|------------|
+| `BinaryoException` | Base exception for all Binaryo errors | `message`, `cause` |
+| `BinaryoTransportException` | HTTP/network transport failures | `statusCode`, `responseBody` |
+| `BinaryoSerializationException` | Serialization/deserialization failures | `targetType` |
+| `BinaryoValidationException` | Input validation failures | - |
+
+**Note:** Exception types changed in this version. If you were catching `IllegalStateException` or `ClassCastException`, update your code to use `BinaryoTransportException` and `BinaryoSerializationException` respectively.
 
 ### Custom Transport
 
@@ -407,7 +431,7 @@ All requests use `application/octet-stream` for binary Kryo payloads.
 
 ### Response Codes
 - `2xx` - Success, response body deserialized automatically
-- `4xx/5xx` - Error, throws `IllegalStateException` with error details
+- `4xx/5xx` - Error, throws `BinaryoTransportException` with status code and response body
 
 ## Performance Characteristics
 

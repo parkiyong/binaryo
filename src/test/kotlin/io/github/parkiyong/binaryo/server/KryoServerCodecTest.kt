@@ -2,11 +2,13 @@ package io.github.parkiyong.binaryo.server
 
 import io.github.parkiyong.binaryo.codec.DefaultKryoFactory
 import io.github.parkiyong.binaryo.codec.KryoPool
+import io.github.parkiyong.binaryo.exception.BinaryoSerializationException
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 import kotlin.test.assertIs
+import kotlin.test.assertTrue
 
 class KryoServerCodecTest {
 
@@ -55,16 +57,17 @@ class KryoServerCodecTest {
     }
 
     @Test
-    fun `fromRequest with type mismatch should throw ClassCastException`() {
+    fun `fromRequest with type mismatch should throw BinaryoSerializationException`() {
         // 1. Arrange
         data class Item(val x: String)
         val originalPerson = Person("Dan", 18)
         val requestBytes = serverCodec.toResponse(originalPerson)
 
         // 2. Act & 3. Assert
-        assertFailsWith<ClassCastException> {
+        val ex = assertFailsWith<BinaryoSerializationException> {
             serverCodec.fromRequest(requestBytes, Item::class)
         }
+        assertTrue(ex.message!!.contains("type mismatch"))
     }
 
     @Test
