@@ -419,7 +419,6 @@ src/
 
 ### Production
 - **Kryo** (5.6.2) - Binary serialization framework
-- **Objenesis** (3.3) - Required by Kryo for object instantiation
 - **Kotlin stdlib** (2.2.21)
 
 ### Optional
