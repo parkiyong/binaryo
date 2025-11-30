@@ -390,9 +390,15 @@ src/
 │   │   └── KryoRestClient.kt            # REST client
 │   ├── codec/
 │   │   └── KryoSupport.kt               # Kryo codec, pool, factory
+│   ├── examples/
+│   │   └── TransportExamples.kt         # Usage examples
+│   ├── exception/
+│   │   └── BinaryoExceptions.kt         # Custom exceptions
 │   ├── http/
 │   │   ├── Transport.kt                 # Transport interface
-│   │   ├── ... various client transports
+│   │   ├── JdkHttpTransport.kt          # JDK HttpClient transport
+│   │   ├── EnhancedJdkHttpTransport.kt  # Enterprise JDK transport
+│   │   └── ApacheHttpClientTransport.kt # Apache HttpClient transport
 │   └── server/
 │       └── KryoServerCodec.kt           # Server-side codec
 └── test/kotlin/io/github/parkiyong/binaryo/
@@ -400,25 +406,27 @@ src/
     │   └── KryoRestClientTest.kt
     ├── codec/
     │   └── KryoCodecTest.kt
+    ├── exception/
+    │   └── BinaryoExceptionsTest.kt
     ├── http/
-    │   └── ... transport tests
+    │   ├── EnhancedJdkHttpTransportTest.kt
+    │   └── ApacheHttpClientTransportTest.kt
     └── server/
-        └── KryoServerCodecTest.kt       # Server codec tests
+        └── KryoServerCodecTest.kt
 ```
 
 ## Dependencies
 
 ### Production
-- **Kryo** (5.6.0) - Binary serialization framework
+- **Kryo** (5.6.2) - Binary serialization framework
 - **Objenesis** (3.3) - Required by Kryo for object instantiation
-- **Kotlin stdlib** (2.2.20)
+- **Kotlin stdlib** (2.2.21)
 
 ### Optional
-- **Apache HttpClient 5** (5.3.1) - Alternative HTTP client (only if using `ApacheHttpClientTransport`)
+- **Apache HttpClient 5** (5.5.1) - Alternative HTTP client (only if using `ApacheHttpClientTransport`)
 
 ### Test
-- **JUnit 5** (5.10.0)
-- **Kotlin Test** (2.2.20)
+- **kotlin-test-junit5** (2.2.21)
 
 ## HTTP Protocol
 
@@ -475,7 +483,7 @@ mvnw clean verify
 
 ## License
 
-See `LICENSE` file for details.
+Apache License 2.0 - See `LICENSE` file for details.
 
 ## Contributing
 
