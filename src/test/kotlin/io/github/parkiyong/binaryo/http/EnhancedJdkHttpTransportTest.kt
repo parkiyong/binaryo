@@ -1,5 +1,6 @@
 package io.github.parkiyong.binaryo.http
 
+import io.github.parkiyong.binaryo.exception.BinaryoTransportException
 import java.net.URI
 import java.time.Duration
 import kotlin.test.*
@@ -20,12 +21,10 @@ class EnhancedJdkHttpTransportTest {
         )
 
         // Note: This will fail to connect, but that's okay for testing interceptor call
-        try {
+        val ex = assertFailsWith<BinaryoTransportException> {
             transport.get(URI.create("http://localhost:99999/test"))
-        } catch (e: Exception) {
-            // Expected - we're just testing interceptor was called
         }
-
+        assertNotNull(ex.message)
         assertTrue(interceptorCalled, "Request interceptor should be called")
     }
 

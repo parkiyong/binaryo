@@ -1,5 +1,6 @@
 package io.github.parkiyong.binaryo.http
 
+import io.github.parkiyong.binaryo.exception.BinaryoTransportException
 import java.net.URI
 import java.net.http.HttpClient
 import java.net.http.HttpRequest
@@ -113,6 +114,7 @@ class EnhancedJdkHttpTransport(
 
     /**
      * Execute request with retry logic for transient failures.
+     * @throws BinaryoTransportException when network or I/O errors occur
      */
     private fun executeWithRetry(block: () -> Transport.SimpleResponse): Transport.SimpleResponse {
         var lastException: Exception? = null
@@ -130,12 +132,37 @@ class EnhancedJdkHttpTransport(
                     val delay = config.retryDelay.toMillis() * (1L shl (attempt - 1))
                     Thread.sleep(delay)
                 } else {
-                    throw e
+                    throw wrapException(e)
                 }
             }
         }
 
-        throw lastException ?: RuntimeException("Retry failed without exception")
+        throw wrapException(lastException ?: RuntimeException("Retry failed without exception"))
+    }
+
+    /**
+     * Wrap exception in BinaryoTransportException with appropriate message.
+     */
+    private fun wrapException(e: Exception): BinaryoTransportException {
+        return when (e) {
+            is BinaryoTransportException -> e
+            is java.net.http.HttpTimeoutException -> BinaryoTransportException(
+                "Request timed out: ${e.message}",
+                cause = e
+            )
+            is java.net.ConnectException -> BinaryoTransportException(
+                "Failed to connect: ${e.message}",
+                cause = e
+            )
+            is java.io.IOException -> BinaryoTransportException(
+                "Network I/O error: ${e.message}",
+                cause = e
+            )
+            else -> BinaryoTransportException(
+                "Transport error: ${e.message}",
+                cause = e
+            )
+        }
     }
 
     /**
