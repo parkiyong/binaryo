@@ -1,7 +1,6 @@
 package io.github.parkiyong.binaryo.client
 
 import io.github.parkiyong.binaryo.codec.KryoCodec
-import io.github.parkiyong.binaryo.exception.BinaryoSerializationException
 import io.github.parkiyong.binaryo.exception.BinaryoTransportException
 import io.github.parkiyong.binaryo.http.Transport
 import java.net.URI
@@ -53,17 +52,7 @@ class KryoRestClient(
                 responseBody = resp.body
             )
         }
-        try {
-            return codec.fromBytes(resp.body, expected)
-        } catch (e: BinaryoSerializationException) {
-            throw e
-        } catch (e: Exception) {
-            throw BinaryoSerializationException(
-                "Failed to deserialize response to type ${expected.qualifiedName}",
-                targetType = expected.qualifiedName,
-                cause = e
-            )
-        }
+        return codec.fromBytes(resp.body, expected)
     }
 
     /**
@@ -86,17 +75,7 @@ class KryoRestClient(
                 responseBody = resp.body
             )
         }
-        try {
-            return codec.fromBytes(resp.body, expected)
-        } catch (e: BinaryoSerializationException) {
-            throw e
-        } catch (e: Exception) {
-            throw BinaryoSerializationException(
-                "Failed to deserialize response to type ${expected.qualifiedName}",
-                targetType = expected.qualifiedName,
-                cause = e
-            )
-        }
+        return codec.fromBytes(resp.body, expected)
     }
 }
 

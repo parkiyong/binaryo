@@ -144,22 +144,23 @@ class EnhancedJdkHttpTransport(
      * Wrap exception in BinaryoTransportException with appropriate message.
      */
     private fun wrapException(e: Exception): BinaryoTransportException {
+        val errorMessage = e.message ?: "Unknown error"
         return when (e) {
             is BinaryoTransportException -> e
             is java.net.http.HttpTimeoutException -> BinaryoTransportException(
-                "Request timed out: ${e.message}",
+                "Request timed out: $errorMessage",
                 cause = e
             )
             is java.net.ConnectException -> BinaryoTransportException(
-                "Failed to connect: ${e.message}",
+                "Failed to connect: $errorMessage",
                 cause = e
             )
             is java.io.IOException -> BinaryoTransportException(
-                "Network I/O error: ${e.message}",
+                "Network I/O error: $errorMessage",
                 cause = e
             )
             else -> BinaryoTransportException(
-                "Transport error: ${e.message}",
+                "Transport error: $errorMessage",
                 cause = e
             )
         }
