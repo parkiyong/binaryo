@@ -1,3 +1,4 @@
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/ad8e70054f0b495589a656ed7b396a1a)](https://app.codacy.com/gh/parkiyong/binaryo?utm_source=github.com&utm_medium=referral&utm_content=parkiyong/binaryo&utm_campaign=Badge_Grade)
 # binaryo - Binary Kryo REST Client
 
 A lightweight, high-performance REST client library for Kotlin/JVM that uses Kryo binary serialization for efficient data transfer over HTTP.
