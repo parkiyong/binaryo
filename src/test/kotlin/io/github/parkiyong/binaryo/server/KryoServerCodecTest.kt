@@ -2,9 +2,9 @@ package io.github.parkiyong.binaryo.server
 
 import io.github.parkiyong.binaryo.codec.DefaultKryoFactory
 import io.github.parkiyong.binaryo.codec.KryoPool
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Test
+import kotlin.test.BeforeTest
+import kotlin.test.Test
+import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 import kotlin.test.assertIs
 
@@ -15,7 +15,7 @@ class KryoServerCodecTest {
     // Define a simple data class for testing
     data class Person(val name: String, val age: Int)
 
-    @BeforeEach
+    @BeforeTest
     fun setUp() {
         // Create a KryoPool with the default factory
         val pool = KryoPool { DefaultKryoFactory.create() }
