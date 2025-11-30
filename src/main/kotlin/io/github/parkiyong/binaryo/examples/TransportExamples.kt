@@ -17,7 +17,6 @@ import java.time.Duration
 /**
  * Examples demonstrating different HTTP transport options for Binaryo.
  *
- * See HTTP_CLIENT_ANALYSIS.md for detailed comparison.
  */
 object TransportExamples {
 
