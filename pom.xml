@@ -7,6 +7,9 @@
     <groupId>io.github.parkiyong</groupId>
     <artifactId>binaryo</artifactId>
     <version>1.0-SNAPSHOT</version>
+    <packaging>bundle</packaging>
+
+    <description>Fast, efficient, binary REST communication for Kotlin/JVM</description>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -54,6 +57,34 @@
             <plugin>
                 <artifactId>maven-failsafe-plugin</artifactId>
                 <version>3.5.4</version>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>maven-bundle-plugin</artifactId>
+                <version>5.1.9</version>
+                <extensions>true</extensions>
+                <configuration>
+                    <instructions>
+                        <Bundle-SymbolicName>${project.groupId}.${project.artifactId}</Bundle-SymbolicName>
+                        <Bundle-Name>Binaryo - Binary Kryo REST Client</Bundle-Name>
+                        <Bundle-Description>${project.description}</Bundle-Description>
+                        <Export-Package>
+                            io.github.parkiyong.binaryo.client;version="${project.version}",
+                            io.github.parkiyong.binaryo.codec;version="${project.version}",
+                            io.github.parkiyong.binaryo.exception;version="${project.version}",
+                            io.github.parkiyong.binaryo.http;version="${project.version}",
+                            io.github.parkiyong.binaryo.server;version="${project.version}"
+                        </Export-Package>
+                        <Private-Package>
+                            io.github.parkiyong.binaryo.examples
+                        </Private-Package>
+                        <Import-Package>
+                            org.apache.hc.client5.*;resolution:=optional,
+                            org.apache.hc.core5.*;resolution:=optional,
+                            *
+                        </Import-Package>
+                    </instructions>
+                </configuration>
             </plugin>
         </plugins>
     </build>

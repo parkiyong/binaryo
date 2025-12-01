@@ -344,6 +344,52 @@ Test coverage:
 - Type safety
 - Complex objects and nullable fields
 
+## OSGi Support
+
+Binaryo is packaged as an OSGi bundle and can be used in OSGi environments like Eclipse, Apache Karaf, and other OSGi containers.
+
+### Bundle Information
+
+- **Bundle-SymbolicName**: `io.github.parkiyong.binaryo`
+- **Bundle-Name**: `Binaryo - Binary Kryo REST Client`
+
+### Exported Packages
+
+The following packages are exported for use by other bundles:
+
+- `io.github.parkiyong.binaryo.client` - REST client classes
+- `io.github.parkiyong.binaryo.codec` - Kryo codec, pool, and factory
+- `io.github.parkiyong.binaryo.exception` - Custom exception classes
+- `io.github.parkiyong.binaryo.http` - Transport interface and implementations
+- `io.github.parkiyong.binaryo.server` - Server-side codec
+
+### Required Bundles
+
+To use Binaryo in an OSGi environment, ensure the following bundles are available:
+
+- **Kryo** (`com.esotericsoftware.kryo`) - Required for serialization
+- **Objenesis** (`org.objenesis`) - Required by Kryo
+- **Kotlin stdlib** (`org.jetbrains.kotlin.osgi-bundle`) - Required for Kotlin runtime
+
+### Optional Dependencies
+
+Apache HttpClient 5 packages (`org.apache.hc.*`) are imported with `resolution:=optional`. This means:
+- The bundle will work without Apache HttpClient if you only use `JdkHttpTransport` or `EnhancedJdkHttpTransport`
+- If you want to use `ApacheHttpClientTransport`, you must install Apache HttpClient 5 bundles in your OSGi container
+
+### Example: Apache Karaf Installation
+
+```bash
+# Install required bundles
+feature:install wrap
+
+# Install Kryo (OSGi-ready since version 5.x)
+bundle:install mvn:com.esotericsoftware/kryo/5.6.2
+
+# Install Binaryo
+bundle:install mvn:io.github.parkiyong/binaryo/1.0-SNAPSHOT
+```
+
 ## Server-Side Usage
 
 The library provides a `KryoServerCodec` to handle server-side Kryo serialization and deserialization in a framework-agnostic way.
