@@ -79,7 +79,8 @@
                             io.github.parkiyong.binaryo.examples
                         </Private-Package>
                         <Import-Package>
-                            org.apache.hc.*;resolution:=optional,
+                            org.apache.hc.client5.*;resolution:=optional,
+                            org.apache.hc.core5.*;resolution:=optional,
                             *
                         </Import-Package>
                     </instructions>

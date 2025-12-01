@@ -383,8 +383,8 @@ Apache HttpClient 5 packages (`org.apache.hc.*`) are imported with `resolution:=
 # Install required bundles
 feature:install wrap
 
-# Install Kryo (may need to wrap if not OSGi-ready)
-bundle:install wrap:mvn:com.esotericsoftware/kryo/5.6.2
+# Install Kryo (OSGi-ready since version 5.x)
+bundle:install mvn:com.esotericsoftware/kryo/5.6.2
 
 # Install Binaryo
 bundle:install mvn:io.github.parkiyong/binaryo/1.0-SNAPSHOT
